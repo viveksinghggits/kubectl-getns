@@ -1,0 +1,21 @@
+#!/bin/bash
+
+print_usage () {
+    echo "Error: The plugin getns expects two argument resource type and resource name. Ex kubectl getns pod pod-0 "
+}
+
+if [ "$#" -ne 2 ]; then
+    print_usage
+    exit
+fi
+
+path="{.items[?(@.metadata.name=='$2')].metadata.namespace}"
+
+nsName=$(kubectl get $1 --all-namespaces -o=jsonpath=$path)
+
+if [ -z $nsName ]; then
+    echo "It seems the resource doesnt exist in the system."
+    exit
+fi
+
+echo $nsName
